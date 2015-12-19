@@ -1,23 +1,23 @@
 ## Coursera R (rprog-35) Assignment 2 Caching and Inverse of Matrix
-## Estimated score:  7 out of 12
-## 1 valid repo
-## 1 >1 commit
-## 1 sha-1 submitted
-## 1 corresponding commit
-## 1 partially complete  [out of 2]
-## 2 functions are commented
-## 0 solution is not correct [out of 2]
-## 0 solution is not correct [out of 2]
-
 
 makeCacheMatrix <- function(x = matrix()) {
   ### Creates a special "matrix" object that can cache its inverse.
   ### x is a matrix()
+  ### calling set will clear the cache
   ### returns a cachable matrix that can be used with cacheSolve
+  inverse <- NULL
+  set <- function(y) {
+    x <<- y
+    inverse <<- NULL
+  }
+  get <- function() x
+  setInverse <- function(i) inverse <<- i
+  getInverse <- function() inverse
   
-  
-  ### for now it just returns the original matrix
-  x
+  #return a list of functions
+  list(set = set, get = get,
+       setInverse = setInverse,
+       getInverse = getInverse)
 
 }
 
@@ -25,7 +25,21 @@ makeCacheMatrix <- function(x = matrix()) {
 cacheSolve <- function(x, ...) {
   ## Return a matrix that is the inverse of 'x'
   ## x is a cachable matrix created previously by makeCacheMatrix
+  ## If the inverse is already cached, it will use cached inverse
+  ## Otherwise it will calculatem cache, and return inverse
   
-  ### solve calculates the inverse of a matrix,  pass in remaining arguments
-  solve(x, ...)     
+  i <- x$getInverse()  #check cache
+  if(!is.null(i)) {    
+    message("getting cached data")
+  } else {  #cache miss
+    i <- solve(x$get(), ...)
+    x$setInverse(i)
+  }
+  
+  i  
 }
+
+#For testing
+randomMatrix <- matrix(sample.int(15, size = 9*9, replace = TRUE), nrow = 9, ncol = 9)
+
+
